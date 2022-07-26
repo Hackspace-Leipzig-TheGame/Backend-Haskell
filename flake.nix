@@ -59,7 +59,6 @@
                 haskellPackages.hlint
                 cabal-install
               ];
-              crossPlatform = [];
               inherit (pre-commit-check) shellHook;
             };
           };
@@ -69,7 +68,7 @@
         inherit system overlays;
         inherit (haskell-nix) config;
       };
-      flake = pkgs.thegame-hs.flake {crossPlatforms = p: [];};
+      flake = pkgs.thegame-hs.flake {};
       defaultPackage = flake.packages."thegame-hs:exe:thegame-hs";
       devShells = {
         default = flake.devShell;
