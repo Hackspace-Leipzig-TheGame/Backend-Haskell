@@ -21,9 +21,14 @@ extra-source-files: CHANGELOG.md
 
 common deps-exts
   build-depends:
+    , aeson
     , base
+    , fin
+    , mtl
     , network
+    , random
     , relude
+    , vec
 
   default-extensions:
     NoMonomorphismRestriction
@@ -48,6 +53,7 @@ common deps-exts
     FlexibleContexts
     FlexibleInstances
     FunctionalDependencies
+    GADTs
     GeneralisedNewtypeDeriving
     HexFloatLiterals
     ImportQualifiedPost
@@ -83,7 +89,10 @@ common deps-exts
 
 library
   import:           deps-exts
-  exposed-modules:  TheGame
+  exposed-modules:
+    TheGame
+    TheGame.Cards
+    TheGame.Types
 
   -- Modules included in this library but not exported.
   -- other-modules:
