@@ -1,0 +1,116 @@
+cabal-version:      3.0
+name:               thegame-hs
+version:            0.1.0.0
+synopsis:
+
+-- A longer description of the package.
+-- description:
+homepage:           https://github.com/Hackspace-Leipzig-TheGame
+
+-- A URL where users can report bugs.
+-- bug-reports:
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             mangoiv
+maintainer:         mail@mangoiv.com
+
+-- A copyright notice.
+-- copyright:
+category:           Game
+extra-source-files: CHANGELOG.md
+
+common deps-exts
+  build-depends:
+    , base
+    , network
+    , relude
+
+  default-extensions:
+    NoMonomorphismRestriction
+    NoStarIsType
+    BangPatterns
+    ConstraintKinds
+    DataKinds
+    DefaultSignatures
+    DeriveAnyClass
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    EmptyDataDecls
+    EmptyDataDeriving
+    ExistentialQuantification
+    ExplicitForAll
+    FlexibleContexts
+    FlexibleInstances
+    FunctionalDependencies
+    GeneralisedNewtypeDeriving
+    HexFloatLiterals
+    ImportQualifiedPost
+    InstanceSigs
+    LambdaCase
+    NamedFieldPuns
+    NamedWildCards
+    NumericUnderscores
+    OverloadedStrings
+    PartialTypeSignatures
+    PatternGuards
+    PatternSynonyms
+    PolyKinds
+    PostfixOperators
+    QuantifiedConstraints
+    RankNTypes
+    RoleAnnotations
+    ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
+    TupleSections
+    TypeApplications
+    TypeFamilyDependencies
+    TypeOperators
+    TypeSynonymInstances
+    ViewPatterns
+
+  ghc-options:        -Wall -Werror
+  mixins:
+    base hiding (Prelude),
+    relude (Relude as Prelude),
+    relude
+
+library
+  import:           deps-exts
+  exposed-modules:  TheGame
+
+  -- Modules included in this library but not exported.
+  -- other-modules:
+
+  -- LANGUAGE extensions used by modules in this package.
+  -- other-extensions:
+  hs-source-dirs:   src
+  default-language: Haskell2010
+
+executable thegame-hs
+  import:           deps-exts
+  main-is:          Main.hs
+
+  -- Modules included in this executable, other than Main.
+  -- other-modules:
+
+  -- LANGUAGE extensions used by modules in this package.
+  -- other-extensions:
+  hs-source-dirs:   app
+  default-language: Haskell2010
+
+test-suite thegame-hs-test
+  import:           deps-exts
+  default-language: Haskell2010
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Main.hs
+  build-depends:
+    , hedgehog
+    , QuickCheck
