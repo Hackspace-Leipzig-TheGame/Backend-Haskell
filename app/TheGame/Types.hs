@@ -1,7 +1,14 @@
-module TheGame.Types where
+module TheGame.Types
+  ( Player (..)
+  , GameAction (..)
+  , TheGameError (..)
+  , GameState (..)
+  , UserResponse (..)
+  , UserResponsePayload (..)
+  )
+where
 
 import Data.Aeson (FromJSON, ToJSON)
-import Data.Functor.Identity (Identity)
 import Data.Kind (Type)
 import Data.Text (Text)
 import Data.UUID (UUID)
@@ -21,8 +28,8 @@ data Player f = MkPlayer
 type GameAction :: (Type -> Type) -> Type
 data GameAction f
   = NewGame {owner :: f (Player f), gameID :: f UUID}
-  | JoinGame {gameID :: f UUID}
-  | CreateUser {playerID :: Player Identity}
+  | JoinGame UUID
+  | CreateUser
 
 type TheGameError :: Type
 data TheGameError
@@ -32,7 +39,7 @@ data TheGameError
   deriving anyclass (ToJSON)
 
 type GameState :: Type
-data GameState
+data GameState = MkGameState
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
@@ -57,9 +64,9 @@ deriving stock instance (forall a. (Show a) => Show (f a)) => (Show (Player f))
 
 deriving stock instance (forall a. (Generic a) => Generic (f a)) => (Generic (Player f))
 
-deriving anyclass instance (forall a. (FromJSON a) => FromJSON (f a), forall a. Generic a => Generic (f a)) => (FromJSON (Player f))
+deriving anyclass instance (forall a. (FromJSON a) => FromJSON (f a), forall a. (Generic a) => Generic (f a)) => (FromJSON (Player f))
 
-deriving anyclass instance (forall a. (ToJSON a) => ToJSON (f a), forall a. Generic a => Generic (f a)) => (ToJSON (Player f))
+deriving anyclass instance (forall a. (ToJSON a) => ToJSON (f a), forall a. (Generic a) => Generic (f a)) => (ToJSON (Player f))
 
 -- GameAction
 
@@ -69,6 +76,6 @@ deriving stock instance (forall a. (Show a) => Show (f a)) => (Show (GameAction 
 
 deriving stock instance (forall a. (Generic a) => Generic (f a)) => (Generic (GameAction f))
 
-deriving anyclass instance (forall a. (FromJSON a) => FromJSON (f a), forall a. Generic a => Generic (f a)) => (FromJSON (GameAction f))
+deriving anyclass instance (forall a. (FromJSON a) => FromJSON (f a), forall a. (Generic a) => Generic (f a)) => (FromJSON (GameAction f))
 
-deriving anyclass instance (forall a. (ToJSON a) => ToJSON (f a), forall a. Generic a => Generic (f a)) => (ToJSON (GameAction f))
+deriving anyclass instance (forall a. (ToJSON a) => ToJSON (f a), forall a. (Generic a) => Generic (f a)) => (ToJSON (GameAction f))

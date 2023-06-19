@@ -1,54 +1,60 @@
-cabal-version:      3.4
-name:               the-game-hs
-version:            0.1.0.0
+cabal-version:   3.4
+name:            the-game-hs
+version:         0.1.0.0
+
 -- synopsis:
 -- description:
-license:            MIT
-license-file:       LICENSE
-author:             mangoiv
-maintainer:         mail@mangoiv.com
+license:         MIT
+license-file:    LICENSE
+author:          mangoiv
+maintainer:      mail@mangoiv.com
+
 -- copyright:
-category:           Web
-build-type:         Simple
-extra-doc-files:    CHANGELOG.md
+category:        Web
+build-type:      Simple
+extra-doc-files: CHANGELOG.md
+
 -- extra-source-files:
 
 common warnings
-    ghc-options: -Wall
+  ghc-options: -Wall
 
 executable the-game-hs
-    import:           warnings
-    main-is:          Main.hs
-    other-modules:
-      , TheGame
-      , TheGame.Types
-      , TheGame.Handlers
-    default-extensions:
-      , BlockArguments
-      , LambdaCase
-      , OverloadedLists
-      , OverloadedStrings
-      , OverloadedRecordDot
-      , PartialTypeSignatures
-      , NoStarIsType
-      , DerivingStrategies
-      , DeriveAnyClass
-      , QuantifiedConstraints
-      , UndecidableInstances
-      , DuplicateRecordFields
-    build-depends:
-      , base
-      , network
-      , wai
-      , wai-websockets
-      , websockets
-      , warp
-      , http-types
-      , uuid
-      , aeson
-      , text
-      , mtl
-      , stm
+  import:             warnings
+  main-is:            Main.hs
+  other-modules:
+    TheGame
+    TheGame.Handlers
+    TheGame.Types
+    TheGame.Util
 
-    hs-source-dirs:   app
-    default-language: GHC2021
+  default-extensions:
+    NoStarIsType
+    BlockArguments
+    DeriveAnyClass
+    DerivingStrategies
+    DuplicateRecordFields
+    LambdaCase
+    OverloadedLists
+    OverloadedRecordDot
+    OverloadedStrings
+    PartialTypeSignatures
+    QuantifiedConstraints
+    UndecidableInstances
+
+  build-depends:
+    , aeson
+    , base
+    , http-types
+    , mtl
+    , network
+    , stm
+    , text
+    , uuid
+    , wai
+    , wai-websockets
+    , warp
+    , websockets
+
+  hs-source-dirs:     app
+  default-language:   GHC2021
