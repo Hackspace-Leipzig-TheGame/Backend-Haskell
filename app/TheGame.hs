@@ -4,10 +4,16 @@ import Control.Concurrent.STM (TChan, TQueue, atomically, dupTChan, readTChan, w
 import Control.Monad (forever, when)
 import Data.Aeson (decode)
 import Data.Functor.Const (Const)
-import Data.Functor.Identity (Identity (Identity, runIdentity))
+import Data.Functor.Identity (Identity (Identity))
 import Data.UUID.V4 qualified as UUID
 import Network.WebSockets (Connection, ServerApp, acceptRequest, receiveData)
-import TheGame.Types (GameAction (CreateUser), Player (MkPlayer, playerID, playerName), TheGameError (InvalidJSONError, PlayerHandshakeFailed), UserResponse (payload, playerID))
+import TheGame.Types
+  ( Addressee (BroadCast, GameCast, SingleCast)
+  , GameAction (CreateUser)
+  , Player (MkPlayer, playerName)
+  , TheGameError (InvalidJSONError, PlayerHandshakeFailed)
+  , UserResponse (addressee, payload)
+  )
 import TheGame.Util (respondJSON)
 
 conLoop :: TChan UserResponse -> TQueue (GameAction (Const ()), Player Identity) -> Player Identity -> Connection -> IO ()
@@ -18,8 +24,11 @@ conLoop respChan actChan user con = do
     Just act -> do
       atomically do writeTQueue actChan (act, user)
       resp <- atomically do readTChan respChan
-      when (runIdentity (user.playerID) == resp.playerID) do
-        respondJSON con resp.payload
+      let p = case resp.addressee of
+            SingleCast addr -> addr == user
+            GameCast addrs -> user `elem` addrs
+            BroadCast -> True
+      when p do respondJSON con resp.payload
 
 handShakePlayer :: TQueue (GameAction (Const ()), Player Identity) -> Connection -> IO (Maybe (Player Identity))
 handShakePlayer actChan con = do

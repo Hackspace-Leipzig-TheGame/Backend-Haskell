@@ -24,6 +24,7 @@ executable the-game-hs
   main-is:            Main.hs
   other-modules:
     TheGame
+    TheGame.Cards
     TheGame.Handlers
     TheGame.Types
     TheGame.Util
@@ -45,6 +46,7 @@ executable the-game-hs
   build-depends:
     , aeson
     , base
+    , containers
     , http-types
     , mtl
     , network

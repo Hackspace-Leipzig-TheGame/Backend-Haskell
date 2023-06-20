@@ -4,12 +4,17 @@ module TheGame.Types
   , TheGameError (..)
   , GameState (..)
   , UserResponse (..)
-  , UserResponsePayload (..)
+  , TheGame (..)
+  , Cards (..)
+  , Addressee (..)
   )
 where
 
+import Control.Monad.Identity (Identity)
 import Data.Aeson (FromJSON, ToJSON)
 import Data.Kind (Type)
+import Data.Map (Map)
+import Data.Set (Set)
 import Data.Text (Text)
 import Data.UUID (UUID)
 import GHC.Generics (Generic)
@@ -28,7 +33,7 @@ data Player f = MkPlayer
 type GameAction :: (Type -> Type) -> Type
 data GameAction f
   = NewGame {owner :: f (Player f), gameID :: f UUID}
-  | JoinGame UUID
+  | JoinGame {joinedGame :: UUID, joinee :: f (Player Identity)}
   | CreateUser
 
 type TheGameError :: Type
@@ -39,26 +44,45 @@ data TheGameError
   deriving anyclass (ToJSON)
 
 type GameState :: Type
-data GameState = MkGameState
+newtype GameState = MkGameState
+  {getGameState :: Map UUID TheGame}
   deriving stock (Eq, Ord, Show, Generic)
+  deriving newtype (Semigroup, Monoid)
   deriving anyclass (ToJSON)
 
-type UserResponse :: Type
-data UserResponse = MkUserResponse
-  { playerID :: UUID
-  , payload :: UserResponsePayload
+data TheGame = MkTheGame
+  { ownerID :: UUID
+  , members :: Set (Player Identity)
+  , cards :: Cards
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
-type UserResponsePayload :: Type
-data UserResponsePayload = MkUserResponsePayload
+data Cards = MkCards
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON)
+
+-- TODO rename in UserPayload f
+type UserResponse :: Type
+data UserResponse = MkUserResponse
+  { addressee :: Addressee
+  , payload :: GameAction Identity
+  }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON)
+
+data Addressee
+  = SingleCast (Player Identity)
+  | BroadCast
+  | GameCast (Set (Player Identity))
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
 -- Player
 
 deriving stock instance (forall a. (Eq a) => Eq (f a)) => (Eq (Player f))
+
+deriving stock instance (forall a. (Ord a) => Ord (f a), forall a. (Eq a) => Eq (f a)) => (Ord (Player f))
 
 deriving stock instance (forall a. (Show a) => Show (f a)) => (Show (Player f))
 
@@ -71,6 +95,8 @@ deriving anyclass instance (forall a. (ToJSON a) => ToJSON (f a), forall a. (Gen
 -- GameAction
 
 deriving stock instance (forall a. (Eq a) => Eq (f a)) => (Eq (GameAction f))
+
+deriving stock instance (forall a. (Ord a) => Ord (f a), forall a. (Eq a) => Eq (f a)) => (Ord (GameAction f))
 
 deriving stock instance (forall a. (Show a) => Show (f a)) => (Show (GameAction f))
 
