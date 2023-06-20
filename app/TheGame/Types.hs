@@ -1,15 +1,20 @@
 module TheGame.Types
   ( Player (..)
+  , PlayerI
   , GameAction (..)
+  , GameInstruction
   , TheGameError (..)
   , GameState (..)
   , UserResponse (..)
   , TheGame (..)
   , Cards (..)
   , Addressee (..)
+  , MessagePayload (..)
+  , GameResult (..)
   )
 where
 
+import Control.Applicative (Const)
 import Control.Monad.Identity (Identity)
 import Data.Aeson (FromJSON, ToJSON)
 import Data.Kind (Type)
@@ -25,6 +30,9 @@ data Player f = MkPlayer
   , playerName :: Text
   }
 
+type PlayerI :: Type
+type PlayerI = Player Identity
+
 -- >>> import Data.Aeson
 -- >>> import Data.Functor.Const
 -- >>> encode (NewGame (Const ()) (Const ()))
@@ -35,6 +43,23 @@ data GameAction f
   = NewGame {owner :: f (Player f), gameID :: f UUID}
   | JoinGame {joinedGame :: UUID, joinee :: f (Player Identity)}
   | CreateUser
+  | StartGame {startedGameDas :: UUID}
+  | Message {payload :: f MessagePayload}
+
+type GameInstruction :: Type
+type GameInstruction = GameAction (Const ())
+
+type MessagePayload :: Type
+data MessagePayload
+  = SpawnedGame {startedGame :: UUID}
+  | FinishedGame {finishedGame :: UUID, gameResult :: GameResult}
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON, FromJSON)
+
+type GameResult :: Type
+data GameResult = MkGameResult
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON, FromJSON)
 
 type TheGameError :: Type
 data TheGameError
@@ -50,15 +75,22 @@ newtype GameState = MkGameState
   deriving newtype (Semigroup, Monoid)
   deriving anyclass (ToJSON)
 
+type TheGame :: Type
 data TheGame = MkTheGame
   { ownerID :: UUID
   , members :: Set (Player Identity)
-  , cards :: Cards
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
+type Cards :: Type
 data Cards = MkCards
+  { leftOne :: [Int]
+  , leftHundred :: [Int]
+  , rightOne :: [Int]
+  , rightHundred :: [Int]
+  , drawStack :: [Int]
+  }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
@@ -71,6 +103,7 @@ data UserResponse = MkUserResponse
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
+type Addressee :: Type
 data Addressee
   = SingleCast (Player Identity)
   | BroadCast

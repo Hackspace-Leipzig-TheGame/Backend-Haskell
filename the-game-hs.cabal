@@ -45,11 +45,13 @@ executable the-game-hs
 
   build-depends:
     , aeson
+    , async
     , base
     , containers
     , http-types
     , mtl
     , network
+    , random
     , stm
     , text
     , uuid

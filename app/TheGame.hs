@@ -10,15 +10,17 @@ import Network.WebSockets (Connection, ServerApp, acceptRequest, receiveData)
 import TheGame.Types
   ( Addressee (BroadCast, GameCast, SingleCast)
   , GameAction (CreateUser)
+  , GameInstruction
   , Player (MkPlayer, playerName)
+  , PlayerI
   , TheGameError (InvalidJSONError, PlayerHandshakeFailed)
   , UserResponse (addressee, payload)
   )
 import TheGame.Util (respondJSON)
 
-conLoop :: TChan UserResponse -> TQueue (GameAction (Const ()), Player Identity) -> Player Identity -> Connection -> IO ()
+conLoop :: TChan UserResponse -> TQueue (GameInstruction, PlayerI) -> PlayerI -> Connection -> IO ()
 conLoop respChan actChan user con = do
-  mact :: Maybe (GameAction (Const ())) <- decode <$> receiveData con
+  mact :: Maybe GameInstruction <- decode <$> receiveData con
   case mact of
     Nothing -> respondJSON con InvalidJSONError
     Just act -> do
@@ -30,7 +32,7 @@ conLoop respChan actChan user con = do
             BroadCast -> True
       when p do respondJSON con resp.payload
 
-handShakePlayer :: TQueue (GameAction (Const ()), Player Identity) -> Connection -> IO (Maybe (Player Identity))
+handShakePlayer :: TQueue (GameInstruction, PlayerI) -> Connection -> IO (Maybe (Player Identity))
 handShakePlayer actChan con = do
   mplayerName :: Maybe (Player (Const ())) <- decode <$> receiveData con
   uuid <- UUID.nextRandom
@@ -40,7 +42,7 @@ handShakePlayer actChan con = do
     Just playerWithID -> atomically do writeTQueue actChan (CreateUser, playerWithID)
   pure mplayerWithID
 
-theGameWebSocket :: TChan UserResponse -> TQueue (GameAction (Const ()), Player Identity) -> ServerApp
+theGameWebSocket :: TChan UserResponse -> TQueue (GameInstruction, PlayerI) -> ServerApp
 theGameWebSocket globalRespChan actChan pending = do
   con <- acceptRequest pending
   respChan <- atomically $ dupTChan globalRespChan
