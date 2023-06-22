@@ -1,6 +1,9 @@
 {
   description = "the game hs";
 
+  nixConfig.extra-trusted-public-keys = ["the-game-hs.cachix.org-1:8xuU4po51RvcZEoAbldcMh128URPKPW+h/hifFJoip0="];
+  nixConfig.extra-substituters = ["the-game-hs.cachix.org"];
+
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   inputs.utils.url = "github:numtide/flake-utils";
   inputs.hls.url = "github:haskell/haskell-language-server";

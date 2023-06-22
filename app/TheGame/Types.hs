@@ -11,12 +11,17 @@ module TheGame.Types
   , Addressee (..)
   , MessagePayload (..)
   , GameResult (..)
+  , CardAction (..)
+  , CardStack (..)
+  , RoundResult (..)
+  , pattern ErrorMessage
   )
 where
 
 import Control.Applicative (Const)
-import Control.Monad.Identity (Identity)
+import Control.Concurrent.STM (TVar)
 import Data.Aeson (FromJSON, ToJSON)
+import Data.Functor.Identity (Identity (..))
 import Data.Kind (Type)
 import Data.Map (Map)
 import Data.Set (Set)
@@ -28,6 +33,7 @@ type Player :: (Type -> Type) -> Type
 data Player f = MkPlayer
   { playerID :: f UUID
   , playerName :: Text
+  , playerCards :: f [Int]
   }
 
 type PlayerI :: Type
@@ -42,22 +48,42 @@ type GameAction :: (Type -> Type) -> Type
 data GameAction f
   = NewGame {owner :: f (Player f), gameID :: f UUID}
   | JoinGame {joinedGame :: UUID, joinee :: f (Player Identity)}
-  | CreateUser
-  | StartGame {startedGameDas :: UUID}
+  | StartGame {startedGame :: UUID}
+  | PlayGame {playedGame :: UUID, theAction :: CardAction}
+  | UpdatePlayer {playedGame :: UUID}
   | Message {payload :: f MessagePayload}
+  | CreateUser
+  | RemoveUser {removedGame :: UUID}
+
+data CardAction
+  = GiveUp
+  | PutCards [(CardStack, Int)]
+  deriving stock (Show, Eq, Ord, Generic)
+  deriving anyclass (FromJSON, ToJSON)
+
+data CardStack = LeftOne | RightOne | LeftHundred | RightHundred
+  deriving stock (Show, Eq, Ord, Generic)
+  deriving anyclass (FromJSON, ToJSON)
 
 type GameInstruction :: Type
 type GameInstruction = GameAction (Const ())
 
+pattern ErrorMessage :: TheGameError -> GameAction Identity
+pattern ErrorMessage msg = Message (Identity (Error msg))
+
 type MessagePayload :: Type
 data MessagePayload
   = SpawnedGame {startedGame :: UUID}
+  | Acted CardAction
   | FinishedGame {finishedGame :: UUID, gameResult :: GameResult}
+  | Error TheGameError
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON, FromJSON)
 
 type GameResult :: Type
-data GameResult = MkGameResult
+data GameResult
+  = Lost
+  | Won
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON, FromJSON)
 
@@ -65,23 +91,31 @@ type TheGameError :: Type
 data TheGameError
   = InvalidJSONError
   | PlayerHandshakeFailed
+  | InvalidGameUUID UUID
+  | GameNotStarted UUID
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (ToJSON)
+  deriving anyclass (ToJSON, FromJSON)
 
 type GameState :: Type
 newtype GameState = MkGameState
   {getGameState :: Map UUID TheGame}
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Generic)
   deriving newtype (Semigroup, Monoid)
-  deriving anyclass (ToJSON)
+
+type RoundResult :: Type
+data RoundResult
+  = PlayerTimedOut
+  | PlayerPlayed CardAction
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON, FromJSON)
 
 type TheGame :: Type
 data TheGame = MkTheGame
   { ownerID :: UUID
+  , gameActs :: TVar (Map PlayerI (Maybe CardAction))
   , members :: Set (Player Identity)
   }
-  deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (ToJSON)
+  deriving stock (Eq, Generic)
 
 type Cards :: Type
 data Cards = MkCards

@@ -32,16 +32,20 @@ executable the-game-hs
   default-extensions:
     NoStarIsType
     BlockArguments
+    DataKinds
     DeriveAnyClass
     DerivingStrategies
     DuplicateRecordFields
+    GADTs
     LambdaCase
     OverloadedLists
     OverloadedRecordDot
     OverloadedStrings
     PartialTypeSignatures
+    PatternSynonyms
     QuantifiedConstraints
     UndecidableInstances
+    ViewPatterns
 
   build-depends:
     , aeson
