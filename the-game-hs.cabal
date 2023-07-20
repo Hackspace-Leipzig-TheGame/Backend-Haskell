@@ -24,6 +24,7 @@ executable the-game-hs
   main-is:            Main.hs
   other-modules:
     TheGame
+    TheGame.Cards
     TheGame.Handlers
     TheGame.Types
     TheGame.Util
@@ -31,23 +32,30 @@ executable the-game-hs
   default-extensions:
     NoStarIsType
     BlockArguments
+    DataKinds
     DeriveAnyClass
     DerivingStrategies
     DuplicateRecordFields
+    GADTs
     LambdaCase
     OverloadedLists
     OverloadedRecordDot
     OverloadedStrings
     PartialTypeSignatures
+    PatternSynonyms
     QuantifiedConstraints
     UndecidableInstances
+    ViewPatterns
 
   build-depends:
     , aeson
+    , async
     , base
+    , containers
     , http-types
     , mtl
     , network
+    , random
     , stm
     , text
     , uuid

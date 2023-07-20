@@ -1,7 +1,10 @@
 {
   description = "the game hs";
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  nixConfig.extra-trusted-public-keys = ["the-game-hs.cachix.org-1:8xuU4po51RvcZEoAbldcMh128URPKPW+h/hifFJoip0="];
+  nixConfig.extra-substituters = ["the-game-hs.cachix.org"];
+
+  inputs.nixpkgs.url = "github:nixos/nixpkgs";
   inputs.utils.url = "github:numtide/flake-utils";
   inputs.hls.url = "github:haskell/haskell-language-server";
   inputs.pchs.url = "github:cachix/pre-commit-hooks.nix";
@@ -16,14 +19,19 @@
   }:
     utils.lib.eachSystem ["x86_64-linux"] (system: let
       pkgs = nixpkgs.legacyPackages.${system};
-      ghcVer = "94";
+      ghcVer = "96";
       server = hls.packages.${system}."haskell-language-server-${ghcVer}";
-      compiler-nix-name = "ghc${ghcVer}";
+      compiler-nix-name = "ghc962";
       src = ./.;
       hspkgs = pkgs.haskell.packages.${compiler-nix-name}.override {
-        overrides = hself: _hsuper:
+        overrides = hself: hsuper:
           with pkgs.haskell.lib.compose; {
+            ormolu = hsuper.ormolu_0_7_1_0;
             the-game-hs = hself.callCabal2nix "the-game-hs" src {};
+            foundation = overrideCabal (_drv: {patches = [];}) hsuper.foundation;
+            warp = dontCheck hsuper.warp_3_3_27; # old warp doesn't compile
+            recv = hsuper.recv_0_1_0; # warps needs newer recv
+            crypton-x509 = dontCheck (markUnbroken hsuper.crypton-x509); # warp needs crypton but tests don't pass
           };
       };
       pcc = pchs.lib.${system}.run {
@@ -46,6 +54,7 @@
         nativeBuildInputs = [
           pkgs.haskellPackages.cabal-install
           pkgs.haskellPackages.hlint
+          # hspkgs.haskell-language-server
           server
         ];
       };

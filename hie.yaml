@@ -1,0 +1,19 @@
+cradle:
+  cabal:
+    - path: "app/Main.hs"
+      component: "the-game-hs:exe:the-game-hs"
+
+    - path: "app/TheGame.hs"
+      component: "the-game-hs:exe:the-game-hs"
+
+    - path: "app/TheGame/Cards.hs"
+      component: "the-game-hs:exe:the-game-hs"
+
+    - path: "app/TheGame/Handlers.hs"
+      component: "the-game-hs:exe:the-game-hs"
+
+    - path: "app/TheGame/Types.hs"
+      component: "the-game-hs:exe:the-game-hs"
+
+    - path: "app/TheGame/Util.hs"
+      component: "the-game-hs:exe:the-game-hs"
