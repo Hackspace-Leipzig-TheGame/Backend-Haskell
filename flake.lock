@@ -68,16 +68,28 @@
         "type": "github"
       }
     },
-    "ghc-lib-parser-94": {
+    "fourmolu-011": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-WElfrJexd0VciSYe0T23s/5pxpOQzKhMn0z5zxa0Ax0=",
+        "narHash": "sha256-g/yDZXeLCHq/iXoZTaTYSb8l9CMny3AKsRQgWElagZI=",
         "type": "tarball",
-        "url": "https://hackage.haskell.org/package/ghc-lib-parser-9.4.4.20221225/ghc-lib-parser-9.4.4.20221225.tar.gz"
+        "url": "https://hackage.haskell.org/package/fourmolu-0.11.0.0/fourmolu-0.11.0.0.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://hackage.haskell.org/package/ghc-lib-parser-9.4.4.20221225/ghc-lib-parser-9.4.4.20221225.tar.gz"
+        "url": "https://hackage.haskell.org/package/fourmolu-0.11.0.0/fourmolu-0.11.0.0.tar.gz"
+      }
+    },
+    "fourmolu-012": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-yru8ls67DMM6WSeVU6xDmmwa48I8S9CUv9NBaxSQ29M=",
+        "type": "tarball",
+        "url": "https://hackage.haskell.org/package/fourmolu-0.12.0.0/fourmolu-0.12.0.0.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://hackage.haskell.org/package/fourmolu-0.12.0.0/fourmolu-0.12.0.0.tar.gz"
       }
     },
     "gitignore": {
@@ -117,52 +129,19 @@
         "type": "github"
       }
     },
-    "haskell-ghc-exactprint": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1678824759,
-        "narHash": "sha256-2I+GyVrfevo/vWZqIdXZ+Cg0+cU/755M0GhaSHiiZCQ=",
-        "owner": "alanz",
-        "repo": "ghc-exactprint",
-        "rev": "db5e8ab3817c9ee34e37359d5839e9526e05e448",
-        "type": "github"
-      },
-      "original": {
-        "owner": "alanz",
-        "ref": "ghc-9.6",
-        "repo": "ghc-exactprint",
-        "type": "github"
-      }
-    },
     "haskell-hie-bios": {
       "flake": false,
       "locked": {
-        "lastModified": 1686930638,
-        "narHash": "sha256-gfcxxHtZ2jUsiKNn/O4jEkfWF/2H04aTnaIvPDbtNlQ=",
+        "lastModified": 1687083252,
+        "narHash": "sha256-h+VTYtCnpTR6HyIDeabi7ZdPJlo6ONw3yPd2vZxDJ7o=",
         "owner": "haskell",
         "repo": "hie-bios",
-        "rev": "3d4fadfb0dc44cb287db9897ecfb503899d33513",
+        "rev": "78d0cd2332e05c46b747b70ca69c0746209f440e",
         "type": "github"
       },
       "original": {
         "owner": "haskell",
         "repo": "hie-bios",
-        "type": "github"
-      }
-    },
-    "haskell-hiedb": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1680249133,
-        "narHash": "sha256-v6PnDMlrdC56QJ9HwDvVFzHkhVbvivUj1LXMVJ0ZLec=",
-        "owner": "wz1000",
-        "repo": "HieDb",
-        "rev": "dac3ebb37ad33f9c042f59091ee87a4b9a2d63d1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "wz1000",
-        "repo": "HieDb",
         "type": "github"
       }
     },
@@ -183,23 +162,6 @@
         "type": "github"
       }
     },
-    "haskell-unix-compat": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1664758053,
-        "narHash": "sha256-JD/EPdPYEOfS6WqGXOZrdcRUiVkHInSwZT8hn/iQmLs=",
-        "owner": "jacobstanley",
-        "repo": "unix-compat",
-        "rev": "3f6bd688cb56224955e77245a2649ba99ea32fff",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jacobstanley",
-        "repo": "unix-compat",
-        "rev": "3f6bd688cb56224955e77245a2649ba99ea32fff",
-        "type": "github"
-      }
-    },
     "hlint-35": {
       "flake": false,
       "locked": {
@@ -212,32 +174,43 @@
         "url": "https://hackage.haskell.org/package/hlint-3.5/hlint-3.5.tar.gz"
       }
     },
+    "hlint-36": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-fH4RYnWeuBqJI5d3Ba+Xs0BxYr0IYFH1OWO3k2iHGlU=",
+        "type": "tarball",
+        "url": "https://hackage.haskell.org/package/hlint-3.6.1/hlint-3.6.1.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://hackage.haskell.org/package/hlint-3.6.1/hlint-3.6.1.tar.gz"
+      }
+    },
     "hls": {
       "inputs": {
         "flake-compat": "flake-compat",
         "flake-utils": "flake-utils",
-        "ghc-lib-parser-94": "ghc-lib-parser-94",
+        "fourmolu-011": "fourmolu-011",
+        "fourmolu-012": "fourmolu-012",
         "gitignore": "gitignore",
-        "haskell-ghc-exactprint": "haskell-ghc-exactprint",
         "haskell-hie-bios": "haskell-hie-bios",
-        "haskell-hiedb": "haskell-hiedb",
         "haskell-implicit-hie-cradle": "haskell-implicit-hie-cradle",
-        "haskell-unix-compat": "haskell-unix-compat",
         "hlint-35": "hlint-35",
+        "hlint-36": "hlint-36",
         "lsp": "lsp",
         "lsp-test": "lsp-test",
         "lsp-types": "lsp-types",
         "nixpkgs": "nixpkgs",
         "ormolu-052": "ormolu-052",
-        "ptr-poker": "ptr-poker",
-        "stylish-haskell": "stylish-haskell"
+        "ormolu-07": "ormolu-07",
+        "stylish-haskell-0145": "stylish-haskell-0145"
       },
       "locked": {
-        "lastModified": 1687153778,
-        "narHash": "sha256-fPfO6ypU5Uji4ukXDJAuIAnqWbmIDtPyw55sFt8TYwk=",
+        "lastModified": 1689842260,
+        "narHash": "sha256-xZSCfMnQSnTTtRWFM524dKAd07XUhJrdjKc6KSvZ/xo=",
         "owner": "haskell",
         "repo": "haskell-language-server",
-        "rev": "a918c02a612603f11de52449316269d390692d37",
+        "rev": "f20562f9b9112e29c94eb9d2e5006cfe85e67679",
         "type": "github"
       },
       "original": {
@@ -316,16 +289,15 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1687103638,
-        "narHash": "sha256-dwy/TK6Db5W7ivcgmcxUykhFwodIg0jrRzOFt7H5NUc=",
+        "lastModified": 1689603187,
+        "narHash": "sha256-EFqaVfacd9Ew42+X0FDUb8P1Zlb/llwFDF0Hfzc48xE=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "91430887645a0953568da2f3e9a3a3bb0a0378ac",
+        "rev": "79e00681e2f273a68af5dd55c8ea819706a69b9a",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixpkgs-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -342,6 +314,18 @@
         "url": "https://hackage.haskell.org/package/ormolu-0.5.2.0/ormolu-0.5.2.0.tar.gz"
       }
     },
+    "ormolu-07": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-5M5gNzSvsiQH1+0oexRByzf5EIET+0BFwR4fLIr2P7g=",
+        "type": "tarball",
+        "url": "https://hackage.haskell.org/package/ormolu-0.7.1.0/ormolu-0.7.1.0.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://hackage.haskell.org/package/ormolu-0.7.1.0/ormolu-0.7.1.0.tar.gz"
+      }
+    },
     "pchs": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -353,29 +337,17 @@
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
-        "lastModified": 1686668298,
-        "narHash": "sha256-AADh9NqHh6X2LOem4BvI7oCkMm+JPCSCE7iIw5nn0VA=",
+        "lastModified": 1689553106,
+        "narHash": "sha256-RFFf6BbpqQB0l1ehAbgri9g9MGZkAY9UdiNotD9fG8Y=",
         "owner": "cachix",
         "repo": "pre-commit-hooks.nix",
-        "rev": "5b6b54d3f722aa95cbf4ddbe35390a0af8c0015a",
+        "rev": "87589fa438dd6d5b8c7c1c6ab2ad69e4663bb51f",
         "type": "github"
       },
       "original": {
         "owner": "cachix",
         "repo": "pre-commit-hooks.nix",
         "type": "github"
-      }
-    },
-    "ptr-poker": {
-      "flake": false,
-      "locked": {
-        "narHash": "sha256-ll3wuUjkhTE8Grcs8LfGpdiuyobrSBmwgjqPOTlrPac=",
-        "type": "tarball",
-        "url": "https://hackage.haskell.org/package/ptr-poker-0.1.2.8/ptr-poker-0.1.2.8.tar.gz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://hackage.haskell.org/package/ptr-poker-0.1.2.8/ptr-poker-0.1.2.8.tar.gz"
       }
     },
     "root": {
@@ -386,16 +358,16 @@
         "utils": "utils"
       }
     },
-    "stylish-haskell": {
+    "stylish-haskell-0145": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-493M/S38dad82mA04l98xK50WPfue618TIln+7hE7VM=",
+        "narHash": "sha256-EE7RFQ6q4Ek8daRgOpNMGepYLa9o8cM4OLjTNUSHQf0=",
         "type": "tarball",
-        "url": "https://hackage.haskell.org/package/stylish-haskell-0.14.4.0/stylish-haskell-0.14.4.0.tar.gz"
+        "url": "https://hackage.haskell.org/package/stylish-haskell-0.14.5.0/stylish-haskell-0.14.5.0.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://hackage.haskell.org/package/stylish-haskell-0.14.4.0/stylish-haskell-0.14.4.0.tar.gz"
+        "url": "https://hackage.haskell.org/package/stylish-haskell-0.14.5.0/stylish-haskell-0.14.5.0.tar.gz"
       }
     },
     "systems": {
@@ -448,11 +420,11 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1687171271,
-        "narHash": "sha256-BJlq+ozK2B1sJDQXS3tzJM5a+oVZmi1q0FlBK/Xqv7M=",
+        "lastModified": 1689068808,
+        "narHash": "sha256-6ixXo3wt24N/melDWjq70UuHQLxGV8jZvooRanIHXw0=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "abfb11bd1aec8ced1c9bb9adfe68018230f4fb3c",
+        "rev": "919d646de7be200f3bf08cb76ae1f09402b6f9b4",
         "type": "github"
       },
       "original": {

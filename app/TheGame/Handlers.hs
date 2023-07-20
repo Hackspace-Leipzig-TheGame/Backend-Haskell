@@ -8,7 +8,6 @@ import Control.Monad.IO.Class (MonadIO (liftIO))
 import Control.Monad.Identity (Identity (runIdentity))
 import Control.Monad.State (MonadState (get, put), StateT, evalStateT, gets, modify, runState, runStateT)
 import Data.Foldable (traverse_)
-import Data.Functor (($>))
 import Data.Functor.Identity (Identity (Identity))
 import Data.Map (Map)
 import Data.Map qualified as M
@@ -24,10 +23,11 @@ import TheGame.Cards (fisherYates, giveCards, initCards, playerRing)
 import TheGame.Types
   ( Addressee (GameCast, SingleCast)
   , CardAction (GiveUp, PutCards)
-  , Cards
+  , CardStack
+  , Cards (MkCards, drawStack)
   , GameAction (CreateUser, JoinGame, Message, NewGame, PlayGame, RemoveUser, StartGame, UpdatePlayer, gameID, joinedGame, joinee, owner)
   , GameInstruction
-  , GameResult (Lost)
+  , GameResult (Lost, Won)
   , GameState (MkGameState, getGameState)
   , MessagePayload (Acted, FinishedGame, SpawnedGame)
   , Player (MkPlayer, playerID)
@@ -36,6 +36,7 @@ import TheGame.Types
   , TheGame (MkTheGame, gameActs, members, ownerID)
   , TheGameError (InvalidGameUUID)
   , UserResponse (MkUserResponse, addressee, payload)
+  , playerCards
   , pattern ErrorMessage
   )
 import TheGame.Util (liftWriteTChan)
@@ -55,6 +56,10 @@ handleActs globalRespChan globalActQueue = forever (runStateT go mempty)
   -- player with a certain uuid at any time
   handleAct :: (GameInstruction, PlayerI) -> StateT GameState IO ()
   handleAct =
+    -- FIXME: this design is flawed, we have to be very careful
+    --        to not do anything that is not authorized
+    --        we probably want to authorize the backend in a special way
+    --        perhaps we want a special functor that tags the origin like \r -> (Bool, r)
     traverse_ (liftWriteTChan globalRespChan) <=< \case
       (NewGame _ _, creator) -> createGame creator
       (JoinGame uuid _, player) -> perUserError player $ joinGame uuid player
@@ -63,12 +68,16 @@ handleActs globalRespChan globalActQueue = forever (runStateT go mempty)
         game <- maybe (throwError (InvalidGameUUID uuid)) pure =<< gets (M.lookup uuid . getGameState)
         liftIO $ atomically do
           modifyTVar' game.gameActs (M.insert player (Just act))
-        pure [MkUserResponse {addressee = SingleCast player, payload = Message (Identity (Acted act))}]
-      (RemoveUser uuid, player) -> perUserError player $ do
+        pure [MkUserResponse {addressee = SingleCast player, payload = Message (Acted act)}]
+      (RemoveUser uuid, player) -> perUserError player do
         game <- maybe (throwError (InvalidGameUUID uuid)) pure =<< gets (M.lookup uuid . getGameState)
         modifyGameState (M.adjust (\g -> g {members = S.delete player g.members}) uuid)
         pure [MkUserResponse {addressee = GameCast game.members, payload = RemoveUser uuid}]
-      (UpdatePlayer uuid, player) -> _
+      -- FIXME: Should require something like authentification
+      (UpdatePlayer uuid, player) -> perUserError player do
+        game <- maybe (throwError (InvalidGameUUID uuid)) pure =<< gets (M.lookup uuid . getGameState)
+        modifyGameState (M.adjust (\g -> g {members = S.insert player g.members}) uuid)
+        pure [MkUserResponse {addressee = GameCast game.members, payload = RemoveUser uuid}]
       (CreateUser, _) -> pure []
       (Message _, _) -> pure []
    where
@@ -93,8 +102,8 @@ spawnGame gameUUID player respChan actQueue = do
           mkResponse pl = MkUserResponse {addressee = GameCast gs, payload = pl}
       liftIO $ withAsync (playGame gameUUID game.gameActs actQueue gs) \as -> do
         res <- wait as
-        liftWriteTChan respChan (mkResponse (Message (Identity (FinishedGame gameUUID res))))
-      pure [mkResponse (Message (Identity (SpawnedGame gameUUID)))]
+        liftWriteTChan respChan (mkResponse (Message (FinishedGame gameUUID res)))
+      pure [mkResponse (Message (SpawnedGame gameUUID))]
     else pure [MkUserResponse {addressee = SingleCast player, payload = ErrorMessage (InvalidGameUUID gameUUID)}]
 
 playGame :: UUID -> TVar (Map PlayerI (Maybe CardAction)) -> TQueue (GameInstruction, PlayerI) -> Set PlayerI -> IO GameResult
@@ -108,30 +117,45 @@ playGame gameUUID acts actQueue players' = do
   updatePlayer :: PlayerI -> STM ()
   updatePlayer = writeTQueue actQueue . (UpdatePlayer gameUUID,)
 
+  performMove :: [(CardStack, Int)] -> m (Either TheGameError PlayerI)
+  performMove = _
+
+  hasWon :: Cards -> Seq PlayerI -> Maybe GameResult
+  hasWon (MkCards {drawStack = []}) ps | all (null . runIdentity . playerCards) ps = Just Won
+  hasWon _ _ = Nothing
+
   go :: StateT (Cards, Seq PlayerI) IO GameResult
-  go =
-    do
-      -- FIXME: how do we keep the player state up to date? perhaps send player state updates via chan?
-      (cards, p Seq.:<| ps) <- get -- if this fails it can be an IO error; sadly there's no NonEmpty Seq
-      timeOut <- liftIO $ registerDelay 30_000_000
-      roundResult <- liftIO $ atomically do
-        currentMap <- readTVar acts
-        case M.lookup p currentMap of
-          Just (Just act) -> pure $ PlayerPlayed act
-          _ -> readTVar timeOut >>= \b -> if b then pure PlayerTimedOut else retry
-      liftIO $ atomically do
-        modifyTVar' acts (M.insert p Nothing)
-      case roundResult of
-        PlayerTimedOut -> do
-          put (cards, ps)
-          liftIO (atomically do writeTQueue actQueue (RemoveUser gameUUID, p))
-          -- we remove the player from the Set, they cannot play anymore
-          go
-        PlayerPlayed act -> case act of
-          GiveUp -> pure Lost
-          PutCards _cards -> do
-            -- TODO: atomically do updatePlayer _
-            _
+  go = do
+    -- FIXME: how do we keep the player state up to date? perhaps send player state updates via chan?
+    (cards, p Seq.:<| ps) <- get -- if this fails it can be an IO error; sadly there's no NonEmpty Seq
+    timeOut <- liftIO $ registerDelay 30_000_000
+    roundResult <- liftIO $ atomically do
+      currentMap <- readTVar acts
+      case M.lookup p currentMap of
+        Just (Just act) -> pure $ PlayerPlayed act
+        _ -> readTVar timeOut >>= \b -> if b then pure PlayerTimedOut else retry
+    liftIO $ atomically do
+      modifyTVar' acts (M.insert p Nothing)
+    case roundResult of
+      PlayerTimedOut -> do
+        put (cards, ps)
+        liftIO (atomically do writeTQueue actQueue (RemoveUser gameUUID, p))
+        -- we remove the player from the Set, they cannot play anymore
+        go
+      PlayerPlayed act -> case act of
+        GiveUp -> pure Lost
+        PutCards move ->
+          performMove move >>= \case
+            Right player -> do
+              liftIO $ atomically do
+                writeTQueue actQueue (UpdatePlayer gameUUID, player)
+              get >>= maybe go pure . uncurry hasWon
+            Left err -> do
+              put (cards, ps)
+              liftIO $ atomically do
+                writeTQueue actQueue (RemoveUser gameUUID, p)
+                writeTQueue actQueue (ErrorMessage err, p)
+              go
 
 createGame :: (MonadIO m, MonadState GameState m) => PlayerI -> m [UserResponse]
 createGame p@(MkPlayer (Identity pid) _pname _cards) = do

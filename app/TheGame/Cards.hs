@@ -7,14 +7,7 @@ import Data.Sequence qualified as Seq
 import Data.Set (Set)
 import System.Random.Stateful (StatefulGen, uniformRM)
 import TheGame.Types
-  ( Cards
-      ( MkCards
-      , drawStack
-      , leftHundred
-      , leftOne
-      , rightHundred
-      , rightOne
-      )
+  ( Cards (MkCards, drawStack, leftHundred, leftOne, rightHundred, rightOne)
   , Player
   , playerCards
   )

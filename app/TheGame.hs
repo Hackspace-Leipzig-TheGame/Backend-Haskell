@@ -36,7 +36,7 @@ handShakePlayer :: TQueue (GameInstruction, PlayerI) -> Connection -> IO (Maybe 
 handShakePlayer actChan con = do
   mplayerName :: Maybe (Player (Const ())) <- decode <$> receiveData con
   uuid <- UUID.nextRandom
-  let mplayerWithID = (\player -> MkPlayer (Identity uuid) (player.playerName)) <$> mplayerName
+  let mplayerWithID = (\player -> MkPlayer (Identity uuid) (player.playerName) (pure [])) <$> mplayerName
   case mplayerWithID of
     Nothing -> respondJSON con PlayerHandshakeFailed
     Just playerWithID -> atomically do writeTQueue actChan (CreateUser, playerWithID)

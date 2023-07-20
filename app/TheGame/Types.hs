@@ -4,6 +4,7 @@ module TheGame.Types
   , GameAction (..)
   , GameInstruction
   , TheGameError (..)
+  , MoveError (..)
   , GameState (..)
   , UserResponse (..)
   , TheGame (..)
@@ -51,7 +52,7 @@ data GameAction f
   | StartGame {startedGame :: UUID}
   | PlayGame {playedGame :: UUID, theAction :: CardAction}
   | UpdatePlayer {playedGame :: UUID}
-  | Message {payload :: f MessagePayload}
+  | Message {payload :: MessagePayload}
   | CreateUser
   | RemoveUser {removedGame :: UUID}
 
@@ -68,8 +69,8 @@ data CardStack = LeftOne | RightOne | LeftHundred | RightHundred
 type GameInstruction :: Type
 type GameInstruction = GameAction (Const ())
 
-pattern ErrorMessage :: TheGameError -> GameAction Identity
-pattern ErrorMessage msg = Message (Identity (Error msg))
+pattern ErrorMessage :: TheGameError -> GameAction f
+pattern ErrorMessage msg = Message (Error msg)
 
 type MessagePayload :: Type
 data MessagePayload
@@ -93,6 +94,12 @@ data TheGameError
   | PlayerHandshakeFailed
   | InvalidGameUUID UUID
   | GameNotStarted UUID
+  | InvalidMove MoveError
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON, FromJSON)
+
+data MoveError
+  = NotEnoughCards
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON, FromJSON)
 
